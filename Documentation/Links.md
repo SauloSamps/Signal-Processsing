@@ -1,5 +1,5 @@
 # Abnerbog's implementation of Levenberg-Marquadt
-An algorithm implemented by user abnerbog using Levenberg-Marquadt optmization.\\
+An algorithm implemented by user abnerbog using Levenberg-Marquadt optmization.//
 http://github.com/abnerbog/levenberg-marquardt-method
 
 # Lmfit's curve fitting implementation
