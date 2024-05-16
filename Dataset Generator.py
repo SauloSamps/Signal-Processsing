@@ -8,9 +8,11 @@ def lorentzian(x, x0, gamma, maximum):
     
     #maximum = maximum * np.pi
     #return (maximum/np.pi) * (gamma / ((x - x0)**2 + gamma**2))
-    return maximum * (gamma / ((x - x0)**2 + gamma**2))
+    #return maximum * (gamma / ((x - x0)**2 + gamma**2))
+    return maximum / (np.pi * gamma**2 + (x - x0)**2)
 
-def generateData(gamma, x0, xmin, xmax, numberOfPoints, amplitude):
+
+def generateData(gamma, x0, xmin, xmax, numberOfPoints, height):
     """
     --------------------------------------------------------------
     GENERATES A RANDOM DATASET IN THE SHAPE OF A LORENTZIAN CURVE
@@ -21,12 +23,12 @@ def generateData(gamma, x0, xmin, xmax, numberOfPoints, amplitude):
     xmin -> lowest x value
     xmax -> max x value
     numberOfPoints -> total number of data points
-    amplitude -> max value of y
+    height -> max value of y
     """
     
     x = np.linspace(xmin, xmax, numberOfPoints)  # Generate x-values
     
-    y = lorentzian(x, x0, gamma, amplitude)  # Calculate y-values
+    y = lorentzian(x, x0, gamma, height)  # Calculate y-values
     return x,y
 
 def addWhiteNoiseRandom(xData, yData, factor):
@@ -36,7 +38,7 @@ def addWhiteNoiseRandom(xData, yData, factor):
 def saveData(xData, yData):
     # Save (x, y) data to a CSV file
     data = np.column_stack((xData, yData))
-    np.savetxt('lorentzian_data.csv', data, delimiter=',', fmt='%.5f,%.5f', header='x,y', comments='')
+    np.savetxt('lorentzian_example.csv', data, delimiter=',', fmt='%.5f,%.5f', header='x,y', comments='')
     
 def showData(xData, yData):
     plt.scatter(xData, yData, label='Data Points', color='r', s=5)

@@ -7,7 +7,9 @@ Created on Wed Mar  6 17:04:26 2024
 import numpy as np
 import matplotlib.pyplot as plt
 import levenberg_marquardt as LM
-#import example_LM as LM2
+from lmfit.models import LorentzianModel
+mod = LorentzianModel()
+
 
 
 def dataset(filename):
@@ -63,16 +65,40 @@ def levmarAlg(x, y, p_init):
     return p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst
 
 def main():
+    
     # Load dataset
-    signal = dataset('Dataset/lorentzian_data_2.csv')
+    signal = dataset('Dataset/lorentzian_example_4.csv')
     x = signal[:, 0]
     y = signal[:, 1]
+    
+    """
+    --------------------------------------------------------------------------------
+    --------------------- Code to run the LM algorithm -----------------------------
+    --------------------------------------------------------------------------------
+    
     
     #starts the lm algorithm
     p_init = np.array([[1.0,1.0,1.0]]).T
     p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = levmarAlg(x,y,p_init)
     
     showGraph(x, y)
+    
+    --------------------------------------------------------------------------------
+    ---------------------------- End of Segment ------------------------------------
+    --------------------------------------------------------------------------------
+    
+    """
+    
+    mod = LorentzianModel()
+    
+    pars = mod.guess(y, x=x)
+    out = mod.fit(y, pars, x=x)
+
+    print(out.fit_report(min_correl=0.25))
+    showGraph(x, y)
+    
+    
+    
     
 
 if __name__ == "__main__":
