@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -53,29 +54,32 @@ def showData(xData, yData):
     
 def generateCurves(gamma, x0, xmin, xmax, numberOfPoints, height):
     
+    
     for i in range(0,100):
-        x,y = generateData(gamma, x0, xmin, xmax, numberOfPoints, height) #generates the lorentzian
-        y_noisy = addWhiteNoiseRandom(x, y, i/100) #adds random white noise by factor
-        saveData(x, y_noisy, "Dataset/" + str(i/100) + ".csv")
-        
-        # Round the data to at most 5 decimal places
-        x_rounded = np.around(x, decimals=5)
-        y_rounded = np.around(y_noisy, decimals=5)
-        
-        showData(x_rounded, y_rounded)
+        os.mkdir("Dataset/" + str(i/100))
+        for j in range(0,1000):
+            x,y = generateData(gamma, x0, xmin, xmax, numberOfPoints, height) #generates the lorentzian
+            y_noisy = addWhiteNoiseRandom(x, y, i/100) #adds random white noise by factor
+            saveData(x, y_noisy, "Dataset/" + str(i/100) + "/" + str(j) + ".csv")
+            
+            # Round the data to at most 5 decimal places
+            #x_rounded = np.around(x, decimals=5)
+            #y_rounded = np.around(y_noisy, decimals=5)
+            
+            #showData(x_rounded, y_rounded)
 
 def main():
     
     
-    x,y = generateData(1, 0, -10, 10, 100, 10) #generates the lorentzian
-    y_noisy = addWhiteNoiseRandom(x, y, 0.0) #adds random white noise by factor
+    #x,y = generateData(1, 0, -10, 10, 100, 10) #generates the lorentzian
+    #y_noisy = addWhiteNoiseRandom(x, y, 0.0) #adds random white noise by factor
     
     # Round the data to at most 5 decimal places
-    x_rounded = np.around(x, decimals=5)
-    y_rounded = np.around(y_noisy, decimals=5)
+    #x_rounded = np.around(x, decimals=5)
+    #y_rounded = np.around(y_noisy, decimals=5)
     
     #saveData(x, y_noisy)
-    showData(x_rounded, y_rounded)
+    #showData(x_rounded, y_rounded)
     
     
     generateCurves(1, 0, -10, 10, 100, 10) #generates the lorentzian
