@@ -98,7 +98,8 @@ def main():
     #print(out['amplitude'].stderr)
     #showGraph(x, y)
     
-    print(out.pretty_print())
+    #print(out.pretty_print())
+    print(mod.fit(y, pars, x=x).fit_report(min_correl=0.25))
 
     #for name, param in out.items():
     #    print(name)
