@@ -8,8 +8,11 @@ def lorentzian(x, x0, gamma, maximum):
     
     #maximum = maximum * np.pi
     #return (maximum/np.pi) * (gamma / ((x - x0)**2 + gamma**2))
+    
     #return maximum * (gamma / ((x - x0)**2 + gamma**2))
-    return maximum / (np.pi * gamma**2 + (x - x0)**2)
+    #return maximum / (np.pi * gamma**2 + (x - x0)**2)
+    
+    return maximum / (1 + ((x - x0) / gamma)**2)
 
 
 def generateData(gamma, x0, xmin, xmax, numberOfPoints, height):
@@ -35,10 +38,10 @@ def addWhiteNoiseRandom(xData, yData, factor):
     y_noisy = yData + np.random.normal(0, factor, len(xData))
     return y_noisy
 
-def saveData(xData, yData):
+def saveData(xData, yData, name):
     # Save (x, y) data to a CSV file
     data = np.column_stack((xData, yData))
-    np.savetxt('lorentzian_example.csv', data, delimiter=',', fmt='%.5f,%.5f', header='x,y', comments='')
+    np.savetxt(name, data, delimiter=',', fmt='%.5f,%.5f', header='x,y', comments='')
     
 def showData(xData, yData):
     plt.scatter(xData, yData, label='Data Points', color='r', s=5)
@@ -47,19 +50,35 @@ def showData(xData, yData):
     plt.title('Lorentzian Curve with Noise')
     plt.legend()
     plt.show()
+    
+def generateCurves(gamma, x0, xmin, xmax, numberOfPoints, height):
+    
+    for i in range(0,100):
+        x,y = generateData(gamma, x0, xmin, xmax, numberOfPoints, height) #generates the lorentzian
+        y_noisy = addWhiteNoiseRandom(x, y, i/100) #adds random white noise by factor
+        saveData(x, y_noisy, "Dataset/" + str(i/100) + ".csv")
+        
+        # Round the data to at most 5 decimal places
+        x_rounded = np.around(x, decimals=5)
+        y_rounded = np.around(y_noisy, decimals=5)
+        
+        showData(x_rounded, y_rounded)
 
 def main():
     
+    
     x,y = generateData(1, 0, -10, 10, 100, 10) #generates the lorentzian
-    y_noisy = addWhiteNoiseRandom(x, y, 0.1) #adds random white noise by factor
+    y_noisy = addWhiteNoiseRandom(x, y, 0.0) #adds random white noise by factor
     
     # Round the data to at most 5 decimal places
     x_rounded = np.around(x, decimals=5)
     y_rounded = np.around(y_noisy, decimals=5)
     
-    saveData(x, y_noisy)
+    #saveData(x, y_noisy)
     showData(x_rounded, y_rounded)
-
+    
+    
+    generateCurves(1, 0, -10, 10, 100, 10) #generates the lorentzian
 
 if __name__ == "__main__":
     main()
