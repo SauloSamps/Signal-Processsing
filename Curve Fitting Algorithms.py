@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import levenberg_marquardt as LM
 from lmfit.models import LorentzianModel
-mod = LorentzianModel()
+
 
 
 
