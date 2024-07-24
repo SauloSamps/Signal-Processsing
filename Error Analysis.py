@@ -5,6 +5,7 @@ Created on Thu Jun  6 11:37:17 2024
 @author: Saulo
 """
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from lmfit.models import LorentzianModel
 
@@ -75,7 +76,7 @@ def showMSE(group_mse_amplitude, group_mse_gamma, group_mse_center):
     plt.title('Amplitude MSE by Noise')
     plt.legend()
     #plt.show()
-    plt.savefig("Report 1/Amplitude MSE.png", dpi=300, bbox_inches='tight')
+    plt.savefig("Report 2/Amplitude MSE.png", dpi=300, bbox_inches='tight')
     plt.clf()
     
     
@@ -85,7 +86,7 @@ def showMSE(group_mse_amplitude, group_mse_gamma, group_mse_center):
     plt.title('Gamma MSE by Noise')
     plt.legend()
     #plt.show()
-    plt.savefig("Report 1/Gamma MSE.png", dpi=300, bbox_inches='tight')
+    plt.savefig("Report 2/Gamma MSE.png", dpi=300, bbox_inches='tight')
     plt.clf()
     
     plt.plot(x, group_mse_center, label='Center', color='g')
@@ -94,7 +95,7 @@ def showMSE(group_mse_amplitude, group_mse_gamma, group_mse_center):
     plt.title('Center MSE by Noise')
     plt.legend()
     #plt.show()
-    plt.savefig("Report 1/Center MSE.png", dpi=300, bbox_inches='tight')
+    plt.savefig("Report 2/Center MSE.png", dpi=300, bbox_inches='tight')
     plt.clf()
     
 
@@ -107,7 +108,17 @@ def showError(x, y_amplitude, y_center, y_gamma):
     plt.title('Fit Error by Noise')
     plt.legend()
     #plt.show()
-    plt.savefig("Report 1/Error.png", dpi=300, bbox_inches='tight')
+    plt.savefig("Report 2/Error.png", dpi=300, bbox_inches='tight')
+    plt.clf()
+
+def showErrorSeparate(x, y_value, name, color):
+    plt.scatter(x, y_value, label=name, color=color, s=5)
+    plt.xlabel('Noise Level')
+    plt.ylabel('Error')
+    plt.title('Fit Error by Noise')
+    plt.legend()
+    #plt.show()
+    plt.savefig("Report 2/" + name + "Error.png", dpi=300, bbox_inches='tight')
     plt.clf()
     
 
@@ -118,7 +129,7 @@ def showData(xData, yData, i):
     plt.title('Lorentzian Curve with Noise = ' + str(i/100))
     plt.legend()
     #plt.show()
-    plt.savefig("Report 1/Curves/" + str(i/100) + ".png", dpi=300, bbox_inches='tight')
+    plt.savefig("Report 2/Curves/" + str(i/100) + ".png", dpi=300, bbox_inches='tight')
     plt.clf()
 
 def showFit(x_fit, y_fit, x, y, i):
@@ -129,45 +140,83 @@ def showFit(x_fit, y_fit, x, y, i):
     plt.title('Lorentzian Curve with Noise = ' + str(i/100))
     plt.legend()
     #plt.show()
-    plt.savefig("Report 1/Curves AND fit/" + str(i/100) + ".png", dpi=300, bbox_inches='tight')
+    plt.savefig("Report 2/Curves AND fit/" + str(i/100) + ".png", dpi=300, bbox_inches='tight')
     plt.clf()
     
 def runFittingAlg():
     y_amplitude = []
     y_gamma = []
     y_center = []
+    
     for i in range(0,100):
-        signal = dataset("Dataset/" + str(i/100) + ".csv")
-        x = signal[:, 0]
-        y = signal[:, 1]
         
-        mod = LorentzianModel()
+        amplitude_error_mean = 0
+        gamma_error_mean = 0
+        center_error_mean = 0
+            
+        if (i%10 == 0):
+            print("Progress: " + str(i) + "%")
         
-        pars = mod.guess(y, x=x)
-        out = mod.fit(y, pars, x=x)
-        values = out.values
+        for j in range(0,1000):
+            signal = dataset("Dataset/" + str(i/100) + "/" + str(j) + ".csv")
+            x = signal[:, 0]
+            y = signal[:, 1]
+            
+            mod = LorentzianModel()
+            
+            pars = mod.guess(y, x=x)
+            out = mod.fit(y, pars, x=x).params
+            #values = mod.fit(y, pars, x=x).values
+            
+            amplitude_error = out['amplitude'].stderr
+            gamma_error = out['sigma'].stderr
+            center_error = out['center'].stderr
+            
+            amplitude_error_mean += amplitude_error
+            gamma_error_mean += gamma_error
+            center_error_mean += center_error
+            
+            """
+            if (j%500 == 0 and j!=0):
+                x_fit,y_fit = generateFit(values['sigma'], values['center'], -10, 10, 100, values['height'])
+                showFit(x_fit, y_fit, x, y, i)
+                showData(x,y,i)
+            """
+            
+            
+        amplitude_error_mean = amplitude_error_mean/1000
+        gamma_error_mean = gamma_error_mean/1000
+        center_error_mean = center_error_mean/1000
+        
+        y_amplitude.append(np.around(amplitude_error_mean, decimals=5))
+        y_gamma.append(np.around(gamma_error_mean, decimals=5))
+        y_center.append(np.around(center_error_mean, decimals=5))
         
         
-        y_amplitude.append(np.around(abs(values['height'] - 10), decimals=5))
-        y_gamma.append(np.around(abs(values['sigma'] - 1), decimals=5))
-        y_center.append(np.around(abs(values['center'] - 0), decimals=5))
         
-        showData(x,y,i)
-        
-        x_fit,y_fit = generateFit(values['sigma'], values['center'], -10, 10, 100, values['height'])
-        showFit(x_fit, y_fit, x, y, i)
         
     return y_amplitude, y_gamma, y_center
 
 def main():
+    
+    try:
+        os.mkdir("Report 2/")
+        #os.mkdir("Report 2/Curves AND fit/")
+        #os.mkdir("Report 2/Curves/")
+    except:
+        print("Directories already exist")
+    
     x_noise = np.linspace(0.0, 0.99, 100)
     
     y_amplitude, y_gamma, y_center = runFittingAlg()
     
-    mse_amplitude, mse_gamma, mse_center = calcMSE(y_amplitude, y_gamma, y_center)
-    showMSE(mse_amplitude, mse_gamma, mse_center)
+    #mse_amplitude, mse_gamma, mse_center = calcMSE(y_amplitude, y_gamma, y_center)
+    #showMSE(mse_amplitude, mse_gamma, mse_center)
     
     showError(x_noise, y_amplitude, y_center, y_gamma)
+    showErrorSeparate(x_noise, y_amplitude, "Amplitude", 'r')
+    showErrorSeparate(x_noise, y_center, "Center", 'g')
+    showErrorSeparate(x_noise, y_gamma, "Gamma", 'b')
     
     
     

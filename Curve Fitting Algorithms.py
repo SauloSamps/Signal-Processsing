@@ -67,7 +67,7 @@ def levmarAlg(x, y, p_init):
 def main():
     
     # Load dataset
-    signal = dataset('Dataset/lorentzian_example_4.csv')
+    signal = dataset('Dataset/lorentzian_example_1.csv')
     x = signal[:, 0]
     y = signal[:, 1]
     
@@ -92,11 +92,17 @@ def main():
     mod = LorentzianModel()
     
     pars = mod.guess(y, x=x)
-    out = mod.fit(y, pars, x=x)
-
-    print(out.fit_report(min_correl=0.25))
-    showGraph(x, y)
+    out = mod.fit(y, pars, x=x).params
     
+
+    #print(out['amplitude'].stderr)
+    #showGraph(x, y)
+    
+    print(out.pretty_print())
+
+    #for name, param in out.items():
+    #    print(name)
+    #    print(param.stderr)    
     
     
     
