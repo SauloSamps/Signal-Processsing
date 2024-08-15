@@ -1,0 +1,15 @@
+
+-------------------------------------------------------------------------------
+
+List of available commands, type help [command name] for further instructions:
+
+generate-data
+data-status
+wipe-data
+show-sample
+save-sample
+save-results
+clear
+quit
+
+-------------------------------------------------------------------------------
