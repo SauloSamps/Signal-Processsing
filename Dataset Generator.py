@@ -57,7 +57,7 @@ def generateCurves(gamma, x0, xmin, xmax, numberOfPoints, height):
     
     for i in range(0,100):
         os.mkdir("Dataset/" + str(i/100))
-        for j in range(0,1000):
+        for j in range(0,100):
             x,y = generateData(gamma, x0, xmin, xmax, numberOfPoints, height) #generates the lorentzian
             y_noisy = addWhiteNoiseRandom(x, y, i/100) #adds random white noise by factor
             saveData(x, y_noisy, "Dataset/" + str(i/100) + "/" + str(j) + ".csv")
@@ -82,7 +82,7 @@ def main():
     #showData(x_rounded, y_rounded)
     
     
-    generateCurves(1, 0, -10, 10, 100, 10) #generates the lorentzian
+    generateCurves(1, 0, -10, 10, 100, 1) #generates the lorentzian
 
 if __name__ == "__main__":
     main()

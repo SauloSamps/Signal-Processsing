@@ -48,6 +48,11 @@ def dataset(filename):
     return data
     
 
+def saveData(xData, yData, name):
+    # Save (x, y) data to a CSV file
+    data = np.column_stack((xData, yData))
+    np.savetxt(name, data, delimiter=',', fmt='%.5f,%.5f', header='x,y', comments='')
+
 def calcMSE(y_amplitude, y_gamma, y_center):
     group_mse_amplitude = []
     group_mse_center = []
@@ -99,10 +104,11 @@ def showMSE(group_mse_amplitude, group_mse_gamma, group_mse_center):
     plt.clf()
     
 
-def showError(x, y_amplitude, y_center, y_gamma):
+def showError(x, y_amplitude, y_center, y_gamma, y_height):
     plt.scatter(x, y_amplitude, label='Amplitude', color='r', s=5)
     plt.scatter(x, y_center, label='Center', color='g', s=5)
     plt.scatter(x, y_gamma, label='Gamma', color='b', s=5)
+    plt.scatter(x, y_height, label='Height', color='black', s=5)
     plt.xlabel('Noise Level')
     plt.ylabel('Error')
     plt.title('Fit Error by Noise')
@@ -147,17 +153,19 @@ def runFittingAlg():
     y_amplitude = []
     y_gamma = []
     y_center = []
+    y_height = []
     
-    for i in range(0,100):
+    for i in range(0,40):
         
         amplitude_error_mean = 0
         gamma_error_mean = 0
         center_error_mean = 0
+        height_error_mean = 0
             
         if (i%10 == 0):
             print("Progress: " + str(i) + "%")
         
-        for j in range(0,1000):
+        for j in range(0,100):
             signal = dataset("Dataset/" + str(i/100) + "/" + str(j) + ".csv")
             x = signal[:, 0]
             y = signal[:, 1]
@@ -171,10 +179,12 @@ def runFittingAlg():
             amplitude_error = out['amplitude'].stderr
             gamma_error = out['sigma'].stderr
             center_error = out['center'].stderr
+            height_error = out['height'].stderr
             
             amplitude_error_mean += amplitude_error
             gamma_error_mean += gamma_error
             center_error_mean += center_error
+            height_error_mean += height_error
             
             """
             if (j%500 == 0 and j!=0):
@@ -184,18 +194,23 @@ def runFittingAlg():
             """
             
             
-        amplitude_error_mean = amplitude_error_mean/1000
-        gamma_error_mean = gamma_error_mean/1000
-        center_error_mean = center_error_mean/1000
+        amplitude_error_mean = amplitude_error_mean/100
+        gamma_error_mean = gamma_error_mean/100
+        center_error_mean = center_error_mean/100
+        height_error_mean = height_error_mean/100
+        
+        amplitude_error_mean = amplitude_error_mean/np.pi
+        
         
         y_amplitude.append(np.around(amplitude_error_mean, decimals=5))
         y_gamma.append(np.around(gamma_error_mean, decimals=5))
         y_center.append(np.around(center_error_mean, decimals=5))
+        y_height.append(np.around(height_error_mean, decimals=5))
         
         
         
         
-    return y_amplitude, y_gamma, y_center
+    return y_amplitude, y_gamma, y_center, y_height
 
 def main():
     
@@ -206,17 +221,27 @@ def main():
     except:
         print("Directories already exist")
     
-    x_noise = np.linspace(0.0, 0.99, 100)
+    x_noise = np.linspace(0.0, 0.40, 40)
     
-    y_amplitude, y_gamma, y_center = runFittingAlg()
+    y_amplitude, y_gamma, y_center,y_height = runFittingAlg()
     
     #mse_amplitude, mse_gamma, mse_center = calcMSE(y_amplitude, y_gamma, y_center)
     #showMSE(mse_amplitude, mse_gamma, mse_center)
     
-    showError(x_noise, y_amplitude, y_center, y_gamma)
+    #Generateas error graph with all variables
+    showError(x_noise, y_amplitude, y_center, y_gamma, y_height)
+    
+    #Saves raw error Data
+    saveData(x_noise, y_amplitude, "Amplitude Error.csv")
+    saveData(x_noise, y_center, "Center Error.csv")
+    saveData(x_noise, y_gamma, "Gamma Error.csv")
+    saveData(x_noise, y_height, "Height Error.csv")
+    
+    #Generate Error Graphs separately
     showErrorSeparate(x_noise, y_amplitude, "Amplitude", 'r')
     showErrorSeparate(x_noise, y_center, "Center", 'g')
     showErrorSeparate(x_noise, y_gamma, "Gamma", 'b')
+    showErrorSeparate(x_noise, y_height, "Height", 'black')
     
     
     
