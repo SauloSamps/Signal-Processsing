@@ -15,9 +15,6 @@ def showData(xData, yData):
     plt.title('Lorentzian Curve with Noise')
     plt.legend()
     plt.show()
-    
-    
-
 
 
 data = np.loadtxt('Dataset/0.0/49.csv', delimiter=',', skiprows=1)
