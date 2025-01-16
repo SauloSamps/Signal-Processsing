@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 15 11:17:28 2024
+
+@author: Saulo
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -54,19 +61,15 @@ def showData(xData, yData):
     
 def generateCurves(gamma, x0, xmin, xmax, numberOfPoints, height):
     
+    x,y = generateData(gamma, x0, xmin, xmax, numberOfPoints, height) #generates the lorentzian
+    y_noisy = addWhiteNoiseRandom(x, y, 0.05) #adds random white noise by factor
+    saveData(x, y_noisy, "example.csv")
     
-    for i in range(0,100):
-        os.mkdir("Dataset/" + str(i/100))
-        for j in range(0,100):
-            x,y = generateData(gamma, x0, xmin, xmax, numberOfPoints, height) #generates the lorentzian
-            y_noisy = addWhiteNoiseRandom(x, y, i/100) #adds random white noise by factor
-            saveData(x, y_noisy, "Dataset/" + str(i/100) + "/" + str(j) + ".csv")
-            
-            # Round the data to at most 5 decimal places
-            #x_rounded = np.around(x, decimals=5)
-            #y_rounded = np.around(y_noisy, decimals=5)
-            
-            #showData(x_rounded, y_rounded)
+    # Round the data to at most 5 decimal places
+    x_rounded = np.around(x, decimals=5)
+    y_rounded = np.around(y_noisy, decimals=5)
+    
+    showData(x_rounded, y_rounded)
 
 def main():
     
@@ -86,4 +89,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
